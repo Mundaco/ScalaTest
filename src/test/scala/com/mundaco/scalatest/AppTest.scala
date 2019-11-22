@@ -1,4 +1,4 @@
-package com.mundaco.p3
+package com.mundaco.scalatest
 
 import org.junit.Test
 
