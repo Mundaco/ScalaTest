@@ -20,7 +20,7 @@ class AppTest extends FunSuite {
     assert(df != null)
     val df1 = df.select("id")
     assert(df1.isInstanceOf[DataFrame])
-    assert(df1 != null)
+    //assert(df1 != null)
 
   }
 
