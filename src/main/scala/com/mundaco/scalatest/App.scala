@@ -18,13 +18,7 @@ object App {
 
   def main(args: Array[String]) = {
 
-
-    spark = SparkSession.builder()
-      .appName("p3")
-      .master("local")
-      .enableHiveSupport()
-      .getOrCreate()
-
+    init()
 
     val df = readCSV(dbname)
       .union(spark.createDataFrame(Seq((5, "Yay!"))))
@@ -40,7 +34,19 @@ object App {
     //writeParquet(df)
     //readParquet().select("name").where("id=1").show()
 
-    spark.close()
+    close()
+  }
+
+  def init(): Unit = {
+    spark = SparkSession.builder()
+      .appName("p3")
+      .master("local")
+      .enableHiveSupport()
+      .getOrCreate()
+  }
+
+  def close(): Unit = {
+
   }
 
   def readCSV(name: String): DataFrame = {
