@@ -21,7 +21,7 @@ object App {
   val orderSchema: StructType = ScalaReflection.schemaFor[Order].dataType.asInstanceOf[StructType]
 
 
-  def createDatabase() = {
+  def createDatabase(): Unit = {
     val clients = readCSV(clients_table_name, clientSchema)
     clients.createOrReplaceTempView(clients_table_name)
     clients.show()
