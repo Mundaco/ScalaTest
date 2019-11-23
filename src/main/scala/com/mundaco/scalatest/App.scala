@@ -59,8 +59,6 @@ object App {
     spark = SparkSession.builder()
       .appName("ScalaTest")
       .master("local")
-      .config("spark.eventLog.enabled","true")
-      .config("spark.eventLog.dir","var/logs/")
       .enableHiveSupport()
       .getOrCreate()
   }
