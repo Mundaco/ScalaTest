@@ -1,5 +1,7 @@
 package com.mundaco.scalatest
 
+
+
 import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{AnalysisException, DataFrame, SparkSession}
@@ -8,38 +10,50 @@ object App {
 
   var spark: SparkSession = _
 
+  final val clients_table_name: String = "clients"
+  case class Client(id: BigInt, name: String)
+  val clientSchema: StructType = ScalaReflection.schemaFor[Client].dataType.asInstanceOf[StructType]
 
-  final val dbname: String = "test"
-  case class MyEntry(id: BigInt, name: String)
-  val schema: StructType = ScalaReflection.schemaFor[MyEntry].dataType.asInstanceOf[StructType]
+  final val orders_table_name: String = "orders"
+  case class Order(id: BigInt, client_id: BigInt, date: String)
+  val orderSchema: StructType = ScalaReflection.schemaFor[Order].dataType.asInstanceOf[StructType]
 
 
+  def createDatabase() = {
+    val clients = readCSV(clients_table_name, clientSchema)
+    clients.createOrReplaceTempView(clients_table_name)
+    clients.show()
+    spark.sql(s"Drop Table If Exists h_$clients_table_name")
+    spark.sql(s"Create Table h_$clients_table_name as select * from $clients_table_name")
 
+    val orders = readCSV(orders_table_name, orderSchema)
+    orders.createOrReplaceTempView(orders_table_name)
+    orders.show()
+    spark.sql(s"Drop Table If Exists h_$orders_table_name")
+    spark.sql(s"Create Table h_$orders_table_name as select * from $orders_table_name")
+  }
 
   def main(args: Array[String]) = {
 
     init()
 
-    val df = readCSV(dbname)
-      .union(spark.createDataFrame(Seq((5, "Yay!"))))
+    //createDatabase()
 
-    println("DataFrame")
-    df.show()
+    spark.sql(
+      "Select " +
+        "O.id, C.name, O.date " +
+        "from h_orders O " +
+        "left outer join h_clients C On O.client_id = C.id " +
+        "Order By O.id"
+    ).show()
 
-    df.createOrReplaceTempView(dbname)
-    spark.sql(s"drop table hive_$dbname")
-    spark.sql(s"Create Table hive_$dbname as select * from $dbname")
-    spark.sql(s"select * from hive_$dbname").show()
-
-    //writeParquet(df)
-    //readParquet().select("name").where("id=1").show()
 
     close()
   }
 
   def init(): Unit = {
     spark = SparkSession.builder()
-      .appName("p3")
+      .appName("ScalaTest")
       .master("local")
       .enableHiveSupport()
       .getOrCreate()
@@ -49,13 +63,11 @@ object App {
 
   }
 
-  def readCSV(name: String): DataFrame = {
+  def readCSV(name: String, schema: StructType): DataFrame = {
 
     spark.read
       .schema(schema)
       .csv(s"res/$name.csv")
-
-
   }
 
   def writeParquet(df: DataFrame, name: String):Unit = {
