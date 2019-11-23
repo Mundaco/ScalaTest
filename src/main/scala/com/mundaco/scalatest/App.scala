@@ -33,7 +33,7 @@ object App {
     spark.sql(s"Create Table h_$orders_table_name as select * from $orders_table_name")
   }
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     init()
 
@@ -47,6 +47,7 @@ object App {
         "Order By O.id"
     ).show()
 
+    System.in.read()
 
     close()
   }
