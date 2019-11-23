@@ -60,7 +60,7 @@ object App {
   }
 
   def close(): Unit = {
-
+    spark.close()
   }
 
   def readCSV(name: String, schema: StructType): DataFrame = {
