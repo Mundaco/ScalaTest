@@ -2,6 +2,8 @@ package com.mundaco.scalatest
 
 
 
+import java.sql.Date
+
 import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{AnalysisException, DataFrame, SparkSession}
@@ -15,7 +17,7 @@ object App {
   val clientSchema: StructType = ScalaReflection.schemaFor[Client].dataType.asInstanceOf[StructType]
 
   final val orders_table_name: String = "orders"
-  case class Order(id: BigInt, client_id: BigInt, date: String)
+  case class Order(id: BigInt, client_id: BigInt, date: Date)
   val orderSchema: StructType = ScalaReflection.schemaFor[Order].dataType.asInstanceOf[StructType]
 
 
@@ -41,10 +43,11 @@ object App {
 
     spark.sql(
       "Select " +
-        "O.id, C.name, O.date " +
+        "O.id, If(C.name is null,'<unknown>',C.name) As name, O.date " +
         "from h_orders O " +
         "left outer join h_clients C On O.client_id = C.id " +
-        "Order By O.id"
+        "Where O.date Between '2019-11-18' And '2019-11-19' " +
+        "Order By O.date"
     ).show()
 
     System.in.read()
@@ -56,6 +59,8 @@ object App {
     spark = SparkSession.builder()
       .appName("ScalaTest")
       .master("local")
+      .config("spark.eventLog.enabled","true")
+      .config("spark.eventLog.dir","var/logs/")
       .enableHiveSupport()
       .getOrCreate()
   }
