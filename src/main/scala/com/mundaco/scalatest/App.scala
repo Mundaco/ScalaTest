@@ -41,11 +41,22 @@ object App {
 
     //createDatabase()
 
+    val clients = readCSV(clients_table_name, clientSchema).as("C")
+    val orders = readCSV(orders_table_name, orderSchema).as("O")
+
+    orders.where(orders("date").between("2019-11-18","2019-11-19"))
+      .join(clients,clients("id") === orders("client_id"),"left_outer")
+      .select("O.id","C.name", "O.date")
+      .na.fill("<unknown>", Seq("name"))
+      .orderBy("date")
+      .show()
+
+
     spark.sql(
       "Select " +
         "O.id, If(C.name is null,'<unknown>',C.name) As name, O.date " +
         "from h_orders O " +
-        "left outer join h_clients C On O.client_id = C.id " +
+        "left outer join h_clients C On C.id = O.client_id " +
         "Where O.date Between '2019-11-18' And '2019-11-19' " +
         "Order By O.date"
     ).show()
