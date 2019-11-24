@@ -44,7 +44,7 @@ object App {
     val clients = readCSV(clients_table_name, clientSchema).as("C")
     val orders = readCSV(orders_table_name, orderSchema).as("O")
 
-    orders.where(orders("date").between("2019-11-18","2019-11-19"))
+    orders.filter(orders("date").between("2019-11-18","2019-11-19"))
       .join(clients,clients("id") === orders("client_id"),"left_outer")
       .select("O.id","C.name", "O.date")
       .na.fill("<unknown>", Seq("name"))
