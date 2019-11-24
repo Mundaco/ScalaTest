@@ -1,6 +1,5 @@
 package com.mundaco.scalatest
 
-import org.apache.spark.sql.DataFrame
 import org.scalatest.FunSuite
 
 
