@@ -38,7 +38,7 @@ object App {
 
     init()
 
-    createDatabase()
+    //createDatabase()
 
     val clients = readCSV(clients_table_name, clientSchema)
     val orders = readCSV(orders_table_name, orderSchema)
