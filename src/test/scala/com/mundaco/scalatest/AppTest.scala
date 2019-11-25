@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 
 class AppTest extends FunSuite {
 
-  App.init
+  App.init()
 
   test("App.init") {
 
@@ -18,5 +18,5 @@ class AppTest extends FunSuite {
     App.main(null)
   }
 
-  App.close
+  App.close()
 }

@@ -20,7 +20,8 @@ object App {
   val orderSchema: StructType = ScalaReflection.schemaFor[Order].dataType.asInstanceOf[StructType]
 
 
-  def createDatabase: Unit = {
+  def createDatabase(): Unit = {
+
     val clients = readCSV(clients_table_name, clientSchema)
     clients.createOrReplaceTempView(clients_table_name)
     clients.show()
@@ -36,9 +37,9 @@ object App {
 
   def main(args: Array[String]): Unit = {
 
-    init
+    init()
 
-    //createDatabase
+    //createDatabase()
 
     val clients = readCSV(clients_table_name, clientSchema)
     val orders = readCSV(orders_table_name, orderSchema)
@@ -62,10 +63,10 @@ object App {
 
     System.in.read()
 
-    close
+    close()
   }
 
-  def init: Unit = {
+  def init(): Unit = {
     spark = SparkSession.builder()
       .appName("ScalaTest")
       .master("local")
@@ -73,7 +74,7 @@ object App {
       .getOrCreate()
   }
 
-  def close: Unit = {
+  def close(): Unit = {
     spark.close()
   }
 
